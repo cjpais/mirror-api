@@ -12,7 +12,7 @@ model Post {
   title          String
   content        String
   createdAt      DateTime
-  digest         String
+  digest         String      @unique
   link           String
   originalDigest String?
   publicationId  Int
