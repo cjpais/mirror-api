@@ -8,17 +8,17 @@ datasource db {
 }
 
 model Post {
-  id             Int         @id @default(autoincrement())
-  title          String
-  content        String
-  createdAt      DateTime
-  publishedAt    DateTime    @default(now())
-  digest         String      @unique
-  link           String
-  originalDigest String?
-  publicationId  Int
-  publication    Publication @relation(fields: [publicationId], references: [id])
-  cursor         String
+  id              Int         @id @default(autoincrement())
+  title           String
+  content         String
+  createdAt       DateTime
+  publishedAt     DateTime    @default(now())
+  digest          String      @unique
+  link            String
+  originalDigest  String?
+  publicationName String
+  publication     Publication @relation(fields: [publicationName], references: [name])
+  cursor          String
 }
 
 model Publication {
