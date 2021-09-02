@@ -11,8 +11,8 @@ model Post {
   id              Int         @id @default(autoincrement())
   title           String
   content         String
-  createdAt       DateTime
-  publishedAt     DateTime    @default(now())
+  createdAt       DateTime    @default(now())
+  publishedAt     DateTime
   digest          String      @unique
   link            String
   originalDigest  String?
