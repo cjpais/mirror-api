@@ -1,23 +1,27 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DB_URL")
 }
 
 model Post {
-  id              Int         @id @default(autoincrement())
-  title           String
-  content         String
-  createdAt       DateTime
-  digest          String
-  link            String
-  originalDigest  String
-  publication     Publication @relation(fields: [publicationId], references: [id])
-  publicationId   Int
+  id             Int         @id @default(autoincrement())
+  title          String
+  content        String
+  createdAt      DateTime
+  digest         String
+  link           String
+  originalDigest String?
+  publicationId  Int
+  publication    Publication @relation(fields: [publicationId], references: [id])
 }
 
 model Publication {
-  id      Int     @id @default(autoincrement())
-  name    String
-  link    String
-  posts   Post[]
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  link  String
+  posts Post[]
 }
