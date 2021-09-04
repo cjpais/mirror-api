@@ -3,9 +3,40 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
-    "@prisma/client": "2.22.0"
+    "feed": "^4.2.2",
+    "graphql": "^15.5.2",
+    "isomorphic-fetch": "^3.0.0",
+    "next": "^11.1.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
   },
   "devDependencies": {
-    "prisma": "2.22.0"
-  }
+    "@prisma/client": "2.22.0",
+    "@types/isomorphic-fetch": "^0.0.35",
+    "@types/node": "^16.7.10",
+    "@types/react": "^17.0.19",
+    "prettier": "^2.3.2",
+    "prisma": "2.22.0",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.2"
+  },
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cjpais/mirror-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cjpais/mirror-api/issues"
+  },
+  "homepage": "https://github.com/cjpais/mirror-api#readme"
 }

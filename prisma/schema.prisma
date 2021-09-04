@@ -15,15 +15,16 @@ model Post {
   publishedAt     DateTime
   digest          String      @unique
   link            String
-  originalDigest  String?
+  originalDigest  String?     @unique
   publicationName String
   publication     Publication @relation(fields: [publicationName], references: [name])
   cursor          String
 }
 
 model Publication {
-  id    Int    @id @default(autoincrement())
-  name  String @unique
-  link  String
-  posts Post[]
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  link      String
+  createdAt DateTime
+  posts     Post[]
 }
