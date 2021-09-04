@@ -1,6 +1,7 @@
 import fetch from "isomorphic-fetch";
 import { NextApiHandler } from "next";
 
+import marked from "marked";
 import prisma from "@lib/prisma";
 
 const query = `
@@ -57,7 +58,7 @@ async function getArData(id: string, cursor: string) {
 
       const post: Post = {
         title: data.content.title,
-        content: data.content.body,
+        content: marked(data.content.body),
         publishedAt: new Date(data.content.timestamp * 1000),
         digest: data.digest,
         link: `${publication.link}/${data.originalDigest}`,

@@ -2,7 +2,7 @@ import { NextApiHandler } from "next";
 import { getPostsFromPublisher } from "@app/features/publishers";
 
 const getPublisherPosts: NextApiHandler = async (req, res) => {
-  const name = req.query.name[0];
+  const name = req.query.name as string;
 
   const posts = await getPostsFromPublisher(name);
 
