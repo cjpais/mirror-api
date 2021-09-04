@@ -11,4 +11,4 @@ const Publisher = (name: string) => {
   );
 };
 
-export default [Publisher];
+export default Publisher;
