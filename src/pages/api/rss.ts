@@ -3,15 +3,10 @@ import { NextApiHandler } from "next";
 import prisma from "@lib/prisma";
 
 import { Feed } from "feed";
+import { getLatestPosts } from "@app/features/posts";
 
 const getAllPostsRSS: NextApiHandler = async (req, res) => {
-  const posts = await prisma.post.findMany({
-    orderBy: [
-      {
-        publishedAt: "desc",
-      },
-    ],
-  });
+  const posts = await getLatestPosts(20);
 
   const feed = new Feed({
     title: `MirrorXYZ`,

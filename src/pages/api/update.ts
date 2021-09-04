@@ -90,6 +90,11 @@ async function getRawPostList(cursor: string) {
     .then((data: any) => data.data.transactions.edges);
 }
 
+type PostModifyType = {
+  post: Post;
+  index: number;
+};
+
 async function getData(
   cursor: string = "",
   publications: Publication[],
@@ -103,7 +108,7 @@ async function getData(
   while (lastElem && lastElem.cursor) {
     const pubAddArr: Publication[] = [];
     const postAddArr: Post[] = [];
-    const postModifyArr: Post[] = [];
+    const postModifyArr: PostModifyType[] = [];
 
     const finished = await edges.map(async (edge) => {
       console.log("processing id", edge.node.id);
@@ -119,13 +124,14 @@ async function getData(
         publications.push(publication);
       }
 
-      if (
-        posts.findIndex((p) => p.originalDigest == post.originalDigest) == -1
-      ) {
+      const modIndex = posts.findIndex(
+        (p) => p.originalDigest == post.originalDigest
+      );
+      if (modIndex == -1) {
         postAddArr.push(post);
         posts.push(post);
       } else {
-        postModifyArr.push(post);
+        postModifyArr.push({ post, index: modIndex });
       }
     });
 
@@ -142,7 +148,9 @@ async function getData(
         data: postAddArr,
       });
 
-      const modPromises = postModifyArr.map((post) => {
+      const modPromises = postModifyArr.map((mod) => {
+        const post = { ...mod.post, publishedAt: posts[mod.index].publishedAt };
+
         if (post.originalDigest) {
           return prisma.post.update({
             where: {
@@ -157,7 +165,6 @@ async function getData(
 
       edges = await getRawPostList(lastElem.cursor);
       lastElem = edges[edges.length - 1];
-      // await getData(lastElem.cursor, publications, posts);
     });
   }
 

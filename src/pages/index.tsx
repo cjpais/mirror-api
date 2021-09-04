@@ -5,7 +5,12 @@ import React from "react";
 const Index = () => {
   return (
     <div className="index">
-      <h1>LATEST MIRRORXYZ UPDATES</h1>
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <h1>LATEST MIRRORXYZ UPDATES</h1>
+        <a style={{ marginLeft: "auto" }} href="https://localhost:3000/api/rss">
+          RSS
+        </a>
+      </div>
       <LatestPosts></LatestPosts>
       <h1>MIRRORXYZ - PUBLISHERS</h1>
       <Publishers></Publishers>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Publication } from ".prisma/client";
 import fetch from "isomorphic-unfetch";
@@ -6,10 +6,11 @@ import fetch from "isomorphic-unfetch";
 const Publishers = () => {
   const [publishers, setPublishers] = useState<Publication[]>();
 
-  fetch("http://localhost:3000/api/publishers")
-    .then((data: any) => data.json())
-    .then((publishers: Publication[]) => setPublishers(publishers));
-  //   _fetch("https://google.com");
+  useEffect(() => {
+    fetch(`/api/publishers`)
+      .then((data: any) => data.json())
+      .then((publishers: Publication[]) => setPublishers(publishers));
+  }, []);
 
   return (
     <div className="publishers">
@@ -17,6 +18,7 @@ const Publishers = () => {
         return (
           <div
             style={{ display: "flex", alignItems: "center", padding: ".25rem" }}
+            key={publisher.name}
           >
             <h4 style={{ margin: 0, marginRight: ".25rem" }}>
               <a href={publisher.link}>{publisher.name}</a>
@@ -33,10 +35,6 @@ const Publishers = () => {
       })}
       <style jsx>{`
         .publishers {
-        }
-
-        a {
-          color: white;
         }
       `}</style>
     </div>

@@ -55,6 +55,10 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
             padding: 1.5rem;
           }
         }
+
+        a {
+          color: white;
+        }
       `}</style>
     </main>
   );
