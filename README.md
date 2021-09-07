@@ -1,6 +1,6 @@
 # mirror-api
 
-A public API into https://mirror.xyz. Primarily being used for generating RSS feeds on top of Mirror. Built on top of the raw data from [arweave](https://www.arweave.org) where mirror is hosting data. Using Next.js and [Prisma](https://www.prisma.io) under the hood.
+A public API into https://mirror.xyz. Primarily being used for generating RSS feeds on top of Mirror. Built on top of the raw data from [arweave](https://www.arweave.org) where mirror is hosting data. Using [Next.js](https://nextjs.org) and [Prisma](https://www.prisma.io) under the hood.
 
 Live Site - https://mirror.cjpais.com
 
