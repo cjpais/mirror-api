@@ -245,22 +245,31 @@ async function getData(
 }
 
 const main: NextApiHandler = async (req, res) => {
-  const publications = await prisma.publication.findMany().catch((error) => []);
-  const posts = await prisma.post
-    .findMany({
-      orderBy: { publishedAt: "desc" },
-    })
-    .catch((error) => []);
+  const key = req.query.key as string;
+  console.log("hit with key", key, process.env.UPDATE_KEY);
 
-  var cursor = "";
+  if (key == process.env.UPDATE_KEY) {
+    const publications = await prisma.publication
+      .findMany()
+      .catch((error) => []);
+    const posts = await prisma.post
+      .findMany({
+        orderBy: { publishedAt: "desc" },
+      })
+      .catch((error) => []);
 
-  if (posts.length != 0) {
-    console.log("latest post published at", posts[0].publishedAt);
-    cursor = posts[0].cursor;
+    var cursor = "";
+
+    if (posts.length != 0) {
+      console.log("latest post published at", posts[0].publishedAt);
+      cursor = posts[0].cursor;
+    }
+
+    getData(cursor, publications, posts);
+    return res.json({ status: "Processing Update" });
+  } else {
+    return res.status(401).json({ status: "No Access" });
   }
-
-  getData(cursor, publications, posts);
-  return res.json({ status: "Processing Update" });
 };
 
 export default main;
