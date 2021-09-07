@@ -5,8 +5,8 @@ import prisma from "@lib/prisma";
 import { Feed } from "feed";
 import { getLatestPosts } from "@app/features/posts";
 
-const getAllPostsRSS: NextApiHandler = async (req, res) => {
-  const posts = await getLatestPosts(20);
+const getPostsRSS: NextApiHandler = async (req, res) => {
+  const posts = await getLatestPosts(30);
 
   const feed = new Feed({
     title: `MirrorXYZ`,
@@ -38,4 +38,4 @@ const getAllPostsRSS: NextApiHandler = async (req, res) => {
   return res.send(feed.rss2());
 };
 
-export default getAllPostsRSS;
+export default getPostsRSS;
