@@ -7,7 +7,7 @@ const Index = () => {
     <div className="index">
       <div style={{ display: "flex", alignItems: "center" }}>
         <h1>LATEST MIRRORXYZ UPDATES</h1>
-        <a style={{ marginLeft: "auto" }} href="https://localhost:3000/api/rss">
+        <a style={{ marginLeft: "auto" }} href={`/api/rss`}>
           RSS
         </a>
       </div>
