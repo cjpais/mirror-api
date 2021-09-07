@@ -6,7 +6,7 @@ Live Site - https://mirror.cjpais.com
 
 ## Installation
 
-1. `git clone `
+1. `git clone git@github.com:cjpais/mirror-api.git`
 2. `yarn install`
 3. `yarn dev`
 4. Visit https://localhost:3000
