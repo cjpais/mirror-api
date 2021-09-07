@@ -13,7 +13,7 @@ Live Site - https://mirror.cjpais.com
 
 ## API
 
-### /api/rss - [Demo](https://mirror.cjpais.com/api/rss)
+### `/api/rss` - [Demo](https://mirror.cjpais.com/api/rss)
 
 Generates an RSS feed for the latest posts from the entire Mirror site
 
