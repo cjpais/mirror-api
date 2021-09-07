@@ -28,7 +28,6 @@ export const getPostsFromPublisher = async (name: string) => {
   const posts: Post[] = [];
 
   postMap.forEach((value, key) => {
-    console.log(key, value.length);
     value.sort(sortPostDesc);
 
     posts.push(value[0]);

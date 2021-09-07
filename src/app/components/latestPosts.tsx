@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Post } from ".prisma/client";
 import fetch from "isomorphic-unfetch";
 import TimeAgo from "react-timeago";
+import Arweave from "./arweave";
 
 const LatestPosts = () => {
   const [posts, setPosts] = useState<Post[]>();
@@ -43,13 +44,22 @@ const LatestPosts = () => {
             </h4>
             <TimeAgo
               date={post.publishedAt}
-              style={{ marginLeft: "auto" }}
+              style={{ marginLeft: "auto", marginRight: ".25rem" }}
             ></TimeAgo>
+            <a
+              href={`https://arweave.net/${post.arweaveTx}`}
+              style={{ height: "16px" }}
+            >
+              <Arweave color="white" height={16} width={16}></Arweave>
+            </a>
           </div>
         );
       })}
       <style jsx>{`
         .posts {
+        }
+
+        .post-row {
         }
       `}</style>
     </div>

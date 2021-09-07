@@ -44,6 +44,7 @@ type Post = {
   originalDigest: string | null;
   cursor: string;
   publicationName: string;
+  arweaveTx: string;
 };
 
 async function getArData(id: string, cursor: string) {
@@ -61,6 +62,7 @@ async function getArData(id: string, cursor: string) {
         content: marked(data.content.body),
         publishedAt: new Date(data.content.timestamp * 1000),
         digest: data.digest,
+        arweaveTx: id,
         link: `${publication.link}/${data.originalDigest}`,
         originalDigest: data.originalDigest,
         publicationName: publication.name,
@@ -93,6 +95,7 @@ async function getRawPostList(cursor: string) {
 type PostModifyType = {
   post: Post;
   index: number;
+  type: string;
 };
 
 async function getData(
@@ -124,14 +127,28 @@ async function getData(
         publications.push(publication);
       }
 
-      const modIndex = posts.findIndex(
+      const modDigest = posts.findIndex(
         (p) => p.originalDigest == post.originalDigest
       );
-      if (modIndex == -1) {
+      const modTitle = posts.findIndex(
+        (p) =>
+          p.publicationName == post.publicationName && p.title == post.title
+      );
+
+      // if (modDigest == -1) {
+      if (modDigest == -1 && modTitle == -1) {
         postAddArr.push(post);
         posts.push(post);
+      } else if (modDigest != -1) {
+        postModifyArr.push({ post, index: modDigest, type: "digest" });
+        // update the title in the local db to make sure we dont fail constraints
+
+        // posts[modDigest].title = post.title;
+      } else if (modTitle != -1) {
+        postModifyArr.push({ post, index: modTitle, type: "title" });
+        // posts[modTitle].originalDigest = post.originalDigest;
       } else {
-        postModifyArr.push({ post, index: modIndex });
+        console.log("shouldnt happen");
       }
     });
 
@@ -144,20 +161,76 @@ async function getData(
         data: pubAddArr,
       });
 
-      await prisma.post.createMany({
-        data: postAddArr,
-      });
+      await prisma.post
+        .createMany({
+          data: postAddArr,
+        })
+        .catch((err) => {
+          console.log("post add arr");
+          console.log(posts);
+          console.log(err);
+        });
 
-      const modPromises = postModifyArr.map((mod) => {
+      const modPromises = await postModifyArr.map(async (mod) => {
         const post = { ...mod.post, publishedAt: posts[mod.index].publishedAt };
 
         if (post.originalDigest) {
-          return prisma.post.update({
-            where: {
-              originalDigest: post.originalDigest,
-            },
-            data: { ...post },
-          });
+          if (mod.type == "digest") {
+            return prisma.post
+              .update({
+                where: {
+                  originalDigest: post.originalDigest,
+                },
+                data: { ...post },
+              })
+              .catch((err) => {
+                console.log(
+                  "original digest error for post",
+                  post.originalDigest,
+                  posts[mod.index].originalDigest
+                );
+                console.log(err);
+              });
+          } else {
+            const result = await prisma.post.findFirst({
+              where: {
+                title: post.title,
+                publicationName: post.publicationName,
+              },
+            });
+
+            if (result) {
+              return prisma.post
+                .update({
+                  where: {
+                    id: result.id,
+                  },
+                  data: {
+                    ...post,
+                    originalDigest: posts[mod.index].originalDigest,
+                  },
+                })
+                .catch((err) => {
+                  console.log(
+                    "title/pub name error for post",
+                    post.originalDigest,
+                    posts[mod.index].originalDigest,
+                    post.title,
+                    posts[mod.index].title,
+                    post.publicationName,
+                    posts[mod.index].publicationName
+                  );
+                  console.log(err);
+                });
+            } else {
+              console.log(
+                "didnt find matching post with title",
+                post.title,
+                "author",
+                post.publicationName
+              );
+            }
+          }
         }
       });
 

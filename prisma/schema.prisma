@@ -19,6 +19,9 @@ model Post {
   publicationName String
   publication     Publication @relation(fields: [publicationName], references: [name])
   cursor          String
+  arweaveTx       String      @unique
+
+  // @@unique([title, publicationName], name: "Title_Publication_Unique")
 }
 
 model Publication {
