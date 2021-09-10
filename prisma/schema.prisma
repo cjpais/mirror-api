@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DB_URL")
+  provider          = "postgresql"
+  url               = env("DB_URL")
+  shadowDatabaseUrl = env("SHADOW_DB_URL")
 }
 
 model Post {
@@ -20,6 +21,7 @@ model Post {
   publication     Publication @relation(fields: [publicationName], references: [name])
   cursor          String
   arweaveTx       String      @unique
+  blockHeight     Int
 
   // @@unique([title, publicationName], name: "Title_Publication_Unique")
 }

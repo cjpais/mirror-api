@@ -5,7 +5,7 @@ import marked from "marked";
 import prisma from "@lib/prisma";
 
 const query = `
-query PaginatedTransactions($cursor: String) {
+query PaginatedTransactions($cursor: String, $height: Int) {
     transactions(
         tags: {
             name: "App-Name",
@@ -13,6 +13,7 @@ query PaginatedTransactions($cursor: String) {
         }
       first: 100
       sort:HEIGHT_ASC
+      block: { min: $height }
       after: $cursor
     ) {
 
@@ -43,11 +44,12 @@ type Post = {
   link: string;
   originalDigest: string | null;
   cursor: string;
+  blockHeight: number;
   publicationName: string;
   arweaveTx: string;
 };
 
-async function getArData(id: string, cursor: string) {
+async function getArData(id: string, cursor: string, blockHeight: number) {
   return await fetch(`https://arweave.net/${id}`)
     .then((r: any) => r.json())
     .then((data: any) => {
@@ -67,6 +69,7 @@ async function getArData(id: string, cursor: string) {
         originalDigest: data.originalDigest,
         publicationName: publication.name,
         cursor: cursor,
+        blockHeight: blockHeight,
       };
 
       return { publication, post };
@@ -77,7 +80,7 @@ async function getArData(id: string, cursor: string) {
     });
 }
 
-async function getRawPostList(cursor: string) {
+async function getRawPostList(cursor: string, height: number) {
   return await fetch("https://arweave.net/graphql", {
     method: "POST",
     headers: {
@@ -85,7 +88,7 @@ async function getRawPostList(cursor: string) {
     },
     body: JSON.stringify({
       query,
-      variables: { cursor },
+      variables: { cursor, height },
     }),
   })
     .then((r: any) => r.json())
@@ -100,12 +103,13 @@ type PostModifyType = {
 
 async function getData(
   cursor: string = "",
+  blockHeight: number = 0,
   publications: Publication[],
   posts: Post[]
 ) {
   console.log("CURSOR AT", cursor);
 
-  var edges: any[] = await getRawPostList(cursor);
+  var edges: any[] = await getRawPostList(cursor, blockHeight);
   var lastElem = edges[edges.length - 1];
 
   while (lastElem && lastElem.cursor) {
@@ -117,9 +121,14 @@ async function getData(
       console.log("processing id", edge.node.id);
       const { publication, post } = await getArData(
         edge.node.id,
-        edge.cursor
+        edge.cursor,
+        edge.node.block.height
       ).catch(async (error: Error) => {
-        return await getArData(edge.node.id, edge.cursor);
+        return await getArData(
+          edge.node.id,
+          edge.cursor,
+          edge.node.block.height
+        );
       });
 
       if (publications.findIndex((p) => p.name == publication.name) == -1) {
@@ -236,7 +245,7 @@ async function getData(
 
       await Promise.all(modPromises);
 
-      edges = await getRawPostList(lastElem.cursor);
+      edges = await getRawPostList(lastElem.cursor, 0);
       lastElem = edges[edges.length - 1];
     });
   }
@@ -259,13 +268,17 @@ const main: NextApiHandler = async (req, res) => {
       .catch((error) => []);
 
     var cursor = "";
+    var blockHeight = 0;
 
     if (posts.length != 0) {
-      console.log("latest post published at", posts[0].publishedAt);
-      cursor = posts[0].cursor;
+      console.log(
+        `latest post published at ${posts[0].publishedAt} with block height ${posts[0].blockHeight}`
+      );
+      // cursor = posts[0].cursor;
+      blockHeight = posts[0].blockHeight;
     }
 
-    getData(cursor, publications, posts);
+    getData(cursor, blockHeight, publications, posts);
     return res.json({ status: "Processing Update" });
   } else {
     return res.status(401).json({ status: "No Access" });
