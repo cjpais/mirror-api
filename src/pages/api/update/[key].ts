@@ -255,7 +255,6 @@ async function getData(
 
 const main: NextApiHandler = async (req, res) => {
   const key = req.query.key as string;
-  console.log("hit with key", key, process.env.UPDATE_KEY);
 
   if (key == process.env.UPDATE_KEY) {
     const publications = await prisma.publication

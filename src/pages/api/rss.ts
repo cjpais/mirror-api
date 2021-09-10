@@ -31,6 +31,12 @@ const getPostsRSS: NextApiHandler = async (req, res) => {
           link: `https://${post.publicationName}.mirror.xyz`,
         },
       ],
+      contributor: [
+        {
+          name: post.publicationName,
+          link: `https://${post.publicationName}.mirror.xyz`,
+        },
+      ],
       date: post.publishedAt,
     });
   });
