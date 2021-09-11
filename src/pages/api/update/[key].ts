@@ -111,8 +111,9 @@ async function getData(
 
   var edges: any[] = await getRawPostList(cursor, blockHeight);
   var lastElem = edges[edges.length - 1];
+  var noAddCount = 0;
 
-  while (lastElem && lastElem.cursor) {
+  while (lastElem && lastElem.cursor && noAddCount < 3) {
     const pubAddArr: Publication[] = [];
     const postAddArr: Post[] = [];
     const postModifyArr: PostModifyType[] = [];
@@ -246,6 +247,8 @@ async function getData(
       await Promise.all(modPromises);
 
       edges = await getRawPostList(lastElem.cursor, 0);
+
+      if (postAddArr.length == 0 && pubAddArr.length == 0) noAddCount++;
       lastElem = edges[edges.length - 1];
     });
   }
