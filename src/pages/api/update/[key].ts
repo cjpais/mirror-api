@@ -49,30 +49,38 @@ type Post = {
   arweaveTx: string;
 };
 
-async function getArData(id: string, cursor: string, blockHeight: number) {
+async function getArData(
+  id: string,
+  cursor: string,
+  blockHeight: number
+): Promise<{ publication: Publication; post: Post }> {
   return await fetch(`https://arweave.net/${id}`)
     .then((r: any) => r.json())
     .then((data: any) => {
-      const publication: Publication = {
-        name: data.content.publication,
-        link: `https://${data.content.publication}.mirror.xyz`,
-        createdAt: new Date(data.content.timestamp * 1000),
-      };
+      if (data.content.publication) {
+        const publication: Publication = {
+          name: data.content.publication,
+          link: `https://${data.content.publication}.mirror.xyz`,
+          createdAt: new Date(data.content.timestamp * 1000),
+        };
 
-      const post: Post = {
-        title: data.content.title,
-        content: marked(data.content.body),
-        publishedAt: new Date(data.content.timestamp * 1000),
-        digest: data.digest,
-        arweaveTx: id,
-        link: `${publication.link}/${data.originalDigest}`,
-        originalDigest: data.originalDigest,
-        publicationName: publication.name,
-        cursor: cursor,
-        blockHeight: blockHeight,
-      };
+        const post: Post = {
+          title: data.content.title,
+          content: marked(data.content.body),
+          publishedAt: new Date(data.content.timestamp * 1000),
+          digest: data.digest,
+          arweaveTx: id,
+          link: `${publication.link}/${data.originalDigest}`,
+          originalDigest: data.originalDigest,
+          publicationName: publication.name,
+          cursor: cursor,
+          blockHeight: blockHeight,
+        };
 
-      return { publication, post };
+        return { publication, post };
+      } else {
+        return {};
+      }
     })
     .catch((error: Error) => {
       console.log(error);
@@ -132,33 +140,35 @@ async function getData(
         );
       });
 
-      if (publications.findIndex((p) => p.name == publication.name) == -1) {
-        pubAddArr.push(publication);
-        publications.push(publication);
-      }
+      if (publication && post) {
+        if (publications.findIndex((p) => p.name == publication.name) == -1) {
+          pubAddArr.push(publication);
+          publications.push(publication);
+        }
 
-      const modDigest = posts.findIndex(
-        (p) => p.originalDigest == post.originalDigest
-      );
-      const modTitle = posts.findIndex(
-        (p) =>
-          p.publicationName == post.publicationName && p.title == post.title
-      );
+        const modDigest = posts.findIndex(
+          (p) => p.originalDigest == post.originalDigest
+        );
+        const modTitle = posts.findIndex(
+          (p) =>
+            p.publicationName == post.publicationName && p.title == post.title
+        );
 
-      // if (modDigest == -1) {
-      if (modDigest == -1 && modTitle == -1) {
-        postAddArr.push(post);
-        posts.push(post);
-      } else if (modDigest != -1) {
-        postModifyArr.push({ post, index: modDigest, type: "digest" });
-        // update the title in the local db to make sure we dont fail constraints
+        // if (modDigest == -1) {
+        if (modDigest == -1 && modTitle == -1) {
+          postAddArr.push(post);
+          posts.push(post);
+        } else if (modDigest != -1) {
+          postModifyArr.push({ post, index: modDigest, type: "digest" });
+          // update the title in the local db to make sure we dont fail constraints
 
-        // posts[modDigest].title = post.title;
-      } else if (modTitle != -1) {
-        postModifyArr.push({ post, index: modTitle, type: "title" });
-        // posts[modTitle].originalDigest = post.originalDigest;
-      } else {
-        console.log("shouldnt happen");
+          // posts[modDigest].title = post.title;
+        } else if (modTitle != -1) {
+          postModifyArr.push({ post, index: modTitle, type: "title" });
+          // posts[modTitle].originalDigest = post.originalDigest;
+        } else {
+          console.log("shouldnt happen");
+        }
       }
     });
 
