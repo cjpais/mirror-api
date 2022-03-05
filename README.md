@@ -4,6 +4,8 @@ A public API into https://mirror.xyz. Primarily being used for generating RSS fe
 
 Live Site - https://mirror.cjpais.com
 
+NOTE: It looks like everything is broken at the moment, however there should be some good info here regardless, just don't expect the endpoints to behave. When I get a chance I will be updating it
+
 ## Installation
 
 1. `git clone git@github.com:cjpais/mirror-api.git`
